@@ -40,7 +40,7 @@ def load_data(data_file):
     df = pd.read_sql('SELECT * FROM Response', engine)
     x = df['message']
     y = df.iloc[:, 4:]
-    return x, y, y.columns
+    return x, y
 
 
 def tokenize(text):
@@ -136,7 +136,7 @@ def export_model(model, model_filepath):
 def run_pipeline(data_file):
 
     print('Loading data and ETL pipeline...')
-    X, y = load_data(data_file)  # run ETL pipeline
+    X, y = load_data(database_filepath)  # run ETL pipeline
 
     print('Building model...')
     model = build_model()  # build model pipeline

@@ -54,9 +54,8 @@ def clean_data(df):
 
 def save_data(df, database_filename):
 
-    engine = create_engine('sqlite:///' + database_filename + '.db')
-    df.to_sql(database_filename, engine, index=False)
-
+    engine = create_engine('sqlite:///' + database_filename)
+    df.to_sql('disaster_messages', engine, index=False)
 
 def main():
     if len(sys.argv) == 4:
@@ -72,6 +71,7 @@ def main():
 
         print('Saving data...\n    DATABASE: {}'.format(database_filepath))
         save_data(df, database_filepath)
+        print('Table used: messages_disaster')
 
         print('Cleaned data saved to database!')
 

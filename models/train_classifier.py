@@ -3,6 +3,7 @@ import sys
 import pandas as pd
 import numpy as np
 from sqlalchemy import create_engine
+import pickle
 import re
 
 import nltk
@@ -24,6 +25,10 @@ from sklearn.model_selection import GridSearchCV
 from sklearn.metrics import classification_report
 from sklearn.base import BaseEstimator, TransformerMixin
 from sklearn.feature_extraction.text import CountVectorizer, TfidfTransformer
+from sklearn.externals import joblib
+
+import warnings
+warnings.simplefilter(action='ignore', category=FutureWarning)
 
 nltk.download(['punkt', 'wordnet', 'stopwords', 'averaged_perceptron_tagger'])
 
@@ -36,12 +41,19 @@ stop_words = set(stopwords.words('english'))
 
 def load_data(database_filepath):
 
+    '''
+    INPUT: string directory of db
+    OUTPUT: x message pd column, y categorical column labels, categorical names
+    '''
+
     # read in file
     engine = create_engine('sqlite:///{}'.format(database_filepath))
     df = pd.read_sql_table('disaster_messages', engine)
     x = df['message']
     y = df.iloc[:, 4:]
-    return x, y
+    category_names = y.columns
+
+    return x, y, category_names
 
 
 def tokenize(text):
@@ -84,15 +96,24 @@ def tokenize(text):
 
 
 def build_model():
+
+    '''
+    INPUT: None
+    OUTPUT: model pipeline object
+    '''
+
     # text processing and model pipeline
     pipeline = pipeline = Pipeline([
             ('vect', CountVectorizer(tokenizer=tokenize)),
             ('tfidf', TfidfTransformer()),
-            ('clf', MultiOutputClassifier(RandomForestClassifier()))
+            ('clf', MultiOutputClassifier(RandomForestClassifier(verbose=1,
+                                                                 max_depth=10)))
         ])
     # define parameters for GridSearchCV
     parameters = {
-    'vect__ngram_range': [(1, 1), (1, 2)]
+    'clf__estimator__n_estimators': [10, 30, 50],
+    'clf__estimator__min_samples_leaf': [0.1, 0.5, 1],
+    'clf__estimator__n_estimators': [5, 12, 30]
     }
 
     # create gridsearch object and return as final model pipeline
@@ -101,37 +122,21 @@ def build_model():
     return model_pipeline
 
 
-def train(X, Y, model):
-    # train test split
-    X_train, X_test, y_train, y_test = train_test_split(X, Y)
-
-    # fit model
-    model.fit(X_train, y_train)
-
-    # predict on test data
-    y_pred = pipeline.predict(X_test)
-
-    # output model test results
-    labels = np.unique(y_pred)
-    accuracy = (y_pred == y_test).mean()
-
-    print('Labels:', labels)
-    print('Accuracy:', accuracy)
-    print('\nMean accuracy:', accuracy.mean())
-
-    return model
-
 def evaluate_model(model, X_test, Y_test, category_names):
 
-    # print confusion_matrix for respective categories
+    '''
+    INPUT: model object, test and validation test columns, unique categories list
+    OUTPUT: print confusion_matrix for respective categories
+    '''
+
     y_pred = model.predict(X_test)
     for i, column in enumerate(category_names):
         print(column)
         print(classification_report(Y_test[column], y_pred[:, i]))
 
-def export_model(model, model_filepath):
+def save_model(model, model_filepath):
     # Export model as a pickle file
-    pickle.dump(model, open(model_filepath, 'wb'))
+    joblib.dump(model, model_filepath, compress=9)
 
 
 def main():

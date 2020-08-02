@@ -6,6 +6,11 @@ from sqlalchemy import create_engine
 
 def load_data(messages_filepath, categories_filepath):
 
+    '''
+    INPUT: text df directory, category df directory
+    OUTPUT: concatted df
+    '''
+
     # load messages dataset
     messages = pd.read_csv(messages_filepath)
 
@@ -25,6 +30,11 @@ def clean_values(value):
     return int(value[-1])
 
 def clean_data(df):
+
+    '''
+    INPUT: dirty original df
+    OUTPUT: cleaned df
+    '''
 
     # create a dataframe of the 36 individual category columns
     categories = df['categories'].str.split(';', expand=True)
@@ -53,6 +63,11 @@ def clean_data(df):
     return df
 
 def save_data(df, database_filename):
+
+    '''
+    INPUT: df, directory for db to be saved
+    OUTPUT: new .db file in defined directory
+    '''
 
     engine = create_engine('sqlite:///' + database_filename)
     df.to_sql('disaster_messages', engine, index=False)

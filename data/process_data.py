@@ -1,4 +1,5 @@
 # import libraries
+import sys
 import pandas as pd
 import numpy as np
 from sqlalchemy import create_engine
@@ -46,8 +47,10 @@ def clean_data(df):
     # concatenate the original dataframe with the new `categories` dataframe
     df = pd.concat([df, categories], axis=1)
 
+    df.drop_duplicates(inplace=True)
+
     # drop duplicates
-    return df.drop_duplicates(inplace=True)
+    return df
 
 def save_data(df, database_filename):
 

@@ -106,11 +106,11 @@ def build_model():
             ('vect', CountVectorizer(tokenizer=tokenize)),
             ('tfidf', TfidfTransformer()),
             ('clf', MultiOutputClassifier(RandomForestClassifier(verbose=1,
-                                                                max_depth=40)))
+                                                                max_depth=80)))
         ])
     # define parameters for GridSearchCV
     parameters = {
-    'clf__estimator__min_samples_split': [1, 2, 4]}
+    'clf__estimator__min_samples_split': [2, 4, 8]}
 
     # create gridsearch object and return as final model pipeline
     model_pipeline = GridSearchCV(pipeline, param_grid=parameters)

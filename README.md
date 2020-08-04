@@ -36,6 +36,11 @@ As part of Udacity's data engineering project, the purpose of this project is to
 
 3. Go to http://0.0.0.0:3001/ in your browser
 
+![homescreen example 1](https://github.com/feeblefruits/disaster_responseline_text_classifier/blob/master/homescreen_image_2.png)
+
+![homescreen example 2](https://github.com/feeblefruits/disaster_responseline_text_classifier/blob/master/homescreen_image.png)
+
+
 MIT License
 
 Copyright (c) 2020 Jacques Coetzee

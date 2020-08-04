@@ -19,7 +19,6 @@ from sklearn.feature_extraction.text import CountVectorizer, TfidfTransformer
 from sklearn.pipeline import Pipeline
 from sklearn.pipeline import FeatureUnion
 from sklearn.multioutput import MultiOutputClassifier
-from sklearn.neighbors import KNeighborsClassifier
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.model_selection import GridSearchCV
 from sklearn.metrics import classification_report
@@ -107,12 +106,11 @@ def build_model():
             ('vect', CountVectorizer(tokenizer=tokenize)),
             ('tfidf', TfidfTransformer()),
             ('clf', MultiOutputClassifier(RandomForestClassifier(verbose=1,
-                                                                 max_depth=3)))
+                                                                max_depth=40)))
         ])
     # define parameters for GridSearchCV
     parameters = {
-    'clf__estimator__min_samples_leaf': [0.5, 1],
-    }
+    'clf__estimator__min_samples_split': [1, 2, 4]}
 
     # create gridsearch object and return as final model pipeline
     model_pipeline = GridSearchCV(pipeline, param_grid=parameters)
